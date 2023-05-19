@@ -50,6 +50,30 @@ export default function App() {
         //         : oldNote
         // }))
     }
+
+        /**
+     * Hints: 
+     * 1. What array method can be used to return a new
+     *    array that has filtered out an item based 
+     *    on a condition?
+     * 2. Notice the parameters being based to the function
+     *    and think about how both of those parameters
+     *    can be passed in during the onClick event handler
+     */
+    
+    function deleteNote(event, noteId) {
+        event.stopPropagation()
+        setNotes(oldNotes => {
+            const newArray = []
+            for(let note of oldNotes){
+                if(note.id != noteId){
+                    newArray.push(note)
+                }
+            }
+            return newArray
+        })
+    }
+
     
     function findCurrentNote() {
         return notes.find(note => {
@@ -73,6 +97,7 @@ export default function App() {
                     currentNote={findCurrentNote()}
                     setCurrentNoteId={setCurrentNoteId}
                     newNote={createNewNote}
+                    deleteNote={deleteNote}
                 />
                 {
                     currentNoteId && 
