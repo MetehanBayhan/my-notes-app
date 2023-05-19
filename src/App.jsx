@@ -7,17 +7,6 @@ import {nanoid} from "nanoid"
 
 export default function App() {
 
-    /**
-     * Challenge:
-     * 1. Every time the `notes` array changes, save it 
-     *    in localStorage. You'll need to use JSON.stringify()
-     *    to turn the array into a string to save in localStorage.
-     * 2. When the app first loads, initialize the notes state
-     *    with the notes saved in localStorage. You'll need to
-     *    use JSON.parse() to turn the stringified array back
-     *    into a real JS array.
-     */
-
     const [notes, setNotes] = React.useState(JSON.parse(localStorage.getItem("notes")) || [])
     const [currentNoteId, setCurrentNoteId] = React.useState(
         () => (notes[0] && notes[0].id) || ""
@@ -25,13 +14,15 @@ export default function App() {
 
     React.useEffect(()=>{
         localStorage.setItem("notes", JSON.stringify(notes))
+        let currentItemIndex = notes.indexOf(findCurrentNote())
+        var item = notes.splice(currentItemIndex, 1)[0];
+        notes.unshift(item);
     },[notes])
 
     function createNewNote() {
         const newNote = {
             id: nanoid(),
             body: "# Type your markdown note's title here",
-            isChanged: false,
         }
         setNotes(prevNotes => [newNote, ...prevNotes])
         setCurrentNoteId(newNote.id)
@@ -40,7 +31,7 @@ export default function App() {
     function updateNote(text) {
         setNotes(oldNotes => oldNotes.map(oldNote => {
             return oldNote.id === currentNoteId
-                ? { ...oldNote, body: text, isChanged:!oldNote.isChanged}
+                ? { ...oldNote, body: text}
                 : oldNote
         }))
     }
@@ -51,9 +42,6 @@ export default function App() {
         }) || notes[0]
     }
 
-    function isUpdated(){
-
-    }
     
     return (
         <main>
@@ -70,7 +58,6 @@ export default function App() {
                     currentNote={findCurrentNote()}
                     setCurrentNoteId={setCurrentNoteId}
                     newNote={createNewNote}
-                    isUpdated={isUpdated}
                 />
                 {
                     currentNoteId && 
