@@ -30,7 +30,8 @@ export default function App() {
     function createNewNote() {
         const newNote = {
             id: nanoid(),
-            body: "# Type your markdown note's title here"
+            body: "# Type your markdown note's title here",
+            isChanged: false,
         }
         setNotes(prevNotes => [newNote, ...prevNotes])
         setCurrentNoteId(newNote.id)
@@ -39,7 +40,7 @@ export default function App() {
     function updateNote(text) {
         setNotes(oldNotes => oldNotes.map(oldNote => {
             return oldNote.id === currentNoteId
-                ? { ...oldNote, body: text }
+                ? { ...oldNote, body: text, isChanged:!oldNote.isChanged}
                 : oldNote
         }))
     }
@@ -48,6 +49,10 @@ export default function App() {
         return notes.find(note => {
             return note.id === currentNoteId
         }) || notes[0]
+    }
+
+    function isUpdated(){
+
     }
     
     return (
@@ -65,6 +70,7 @@ export default function App() {
                     currentNote={findCurrentNote()}
                     setCurrentNoteId={setCurrentNoteId}
                     newNote={createNewNote}
+                    isUpdated={isUpdated}
                 />
                 {
                     currentNoteId && 
