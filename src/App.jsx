@@ -14,9 +14,11 @@ export default function App() {
 
     React.useEffect(()=>{
         localStorage.setItem("notes", JSON.stringify(notes))
-        let currentItemIndex = notes.indexOf(findCurrentNote())
-        var item = notes.splice(currentItemIndex, 1)[0];
-        notes.unshift(item);
+
+        //* This code whenever notes array updates, it places the code that modified on top *
+        // let currentItemIndex = notes.indexOf(findCurrentNote())
+        // var item = notes.splice(currentItemIndex, 1)[0];
+        // notes.unshift(item);
     },[notes])
 
     function createNewNote() {
@@ -29,11 +31,24 @@ export default function App() {
     }
     
     function updateNote(text) {
-        setNotes(oldNotes => oldNotes.map(oldNote => {
-            return oldNote.id === currentNoteId
-                ? { ...oldNote, body: text}
-                : oldNote
-        }))
+        setNotes(oldNotes => {
+            const updatedNotesArray = []
+            for(let note of oldNotes){
+                if(currentNoteId == note.id){
+                    updatedNotesArray.unshift({...note, body:text})
+                } else {
+                    updatedNotesArray.push(note)
+                }
+            }
+            return updatedNotesArray
+        })
+
+
+        // setNotes(oldNotes => oldNotes.map(oldNote => {
+        //     return oldNote.id === currentNoteId
+        //         ? { ...oldNote, body: text}
+        //         : oldNote
+        // }))
     }
     
     function findCurrentNote() {
