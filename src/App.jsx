@@ -2,7 +2,13 @@ import React from "react"
 import Sidebar from "./components/Sidebar"
 import Editor from "./components/Editor"
 import Split from "react-split"
-import { addDoc, onSnapshot, doc, deleteDoc } from "firebase/firestore"
+import { 
+    addDoc, 
+    onSnapshot, 
+    doc, 
+    deleteDoc,
+    setDoc
+} from "firebase/firestore"
 import { notesCollection } from "./firebase"
 import { db } from "./firebase"
 
@@ -10,8 +16,6 @@ export default function App() {
 
     const [notes, setNotes] = React.useState([])
     const [currentNoteId, setCurrentNoteId] = React.useState("")
-
-    console.log(currentNoteId);
 
     const currentNote = notes.find(note => {
         return note.id === currentNoteId
@@ -33,34 +37,26 @@ export default function App() {
         if(!currentNoteId){
             setCurrentNoteId(notes[0]?.id)
         }
+        const sortedArray = [...notes].sort((a, b) => b.updatedAt - a.updatedAt);
+
     },[notes])
+    
     async function createNewNote() {
         const newNote = {
             body: "# Type your markdown note's title here",
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
         }
         const newNoteRef = await addDoc(notesCollection, newNote)
         setCurrentNoteId(newNoteRef.id)
     }
-    
-    function updateNote(text) {
-        setNotes(oldNotes => {
-            const updatedNotesArray = []
-            for(let note of oldNotes){
-                if(currentNoteId == note.id){
-                    updatedNotesArray.unshift({...note, body:text})
-                } else {
-                    updatedNotesArray.push(note)
-                }
-            }
-            return updatedNotesArray
-        })
 
-
-        // setNotes(oldNotes => oldNotes.map(oldNote => {
-        //     return oldNote.id === currentNoteId
-        //         ? { ...oldNote, body: text}
-        //         : oldNote
-        // }))
+    async function updateNote(text) {
+        const docRef = doc(db, "notes", currentNoteId)
+        await setDoc(docRef, { 
+            body: text,
+            updatedAt: Date.now(),    
+        }, { merge: true }) 
     }
     
     async function deleteNote(noteId) {
