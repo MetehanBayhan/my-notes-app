@@ -63,15 +63,7 @@ export default function App() {
     
     function deleteNote(event, noteId) {
         event.stopPropagation()
-        setNotes(oldNotes => {
-            const newArray = []
-            for(let note of oldNotes){
-                if(note.id != noteId){
-                    newArray.push(note)
-                }
-            }
-            return newArray
-        })
+        setNotes(oldNotes => oldNotes.filter(note => noteId != note.id))
     }
 
     
