@@ -16,10 +16,13 @@ export default function App() {
 
     const [notes, setNotes] = React.useState([])
     const [currentNoteId, setCurrentNoteId] = React.useState("")
+    const [tempNoteText, setTempNoteText] = React.useState("")
 
     const currentNote = notes.find(note => {
         return note.id === currentNoteId
     }) || notes[0]
+
+    const sortedArray = [...notes].sort((a, b) => b.updatedAt - a.updatedAt);
 
     React.useEffect(()=>{
         const unsubscribe = onSnapshot(notesCollection, function(snapshot) {
@@ -37,13 +40,26 @@ export default function App() {
         if(!currentNoteId){
             setCurrentNoteId(notes[0]?.id)
         }
-        const sortedArray = [...notes].sort((a, b) => b.updatedAt - a.updatedAt);
-
     },[notes])
+
+    React.useEffect(()=>{
+        if(currentNote){
+            setTempNoteText(currentNote.body)
+        }
+    },[currentNote])
+
+    React.useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            if(currentNote.body !== tempNoteText){
+                updateNote(tempNoteText)
+            }
+        }, 500)
+        return () => clearTimeout(timeoutId)
+    },[tempNoteText])
     
     async function createNewNote() {
         const newNote = {
-            body: "# Type your markdown note's title here",
+            body: "# Doldur beni notunla 🥳",
             createdAt: Date.now(),
             updatedAt: Date.now(),
         }
@@ -76,15 +92,15 @@ export default function App() {
                 className="split"
             >
                 <Sidebar
-                    notes={notes}
+                    notes={sortedArray}
                     currentNote={currentNote}
                     setCurrentNoteId={setCurrentNoteId}
                     newNote={createNewNote}
                     deleteNote={deleteNote}
                 />
                 <Editor 
-                    currentNote={currentNote} 
-                    updateNote={updateNote} 
+                    tempNoteText={tempNoteText} 
+                    setTempNoteText={setTempNoteText} 
                 />
             
             </Split>
